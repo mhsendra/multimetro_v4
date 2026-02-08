@@ -35,12 +35,15 @@ float measureMosfet()
         analogWrite(pin.TP1, (int)(vg / 5.0f * 255));
         delay(2);
 
-        // Medir tensión en drenador
+        // Medir tensión en drenador usando ADC V4
         adc_manager_select(RANGE_DC_20V);
         adc_manager_set_sps(ADC_SPS_475);
 
-        uint16_t raw = adc_manager_read_blocking();
-        float vd = adc_manager_raw_to_voltage(raw);
+        float vd = adc_manager_read_voltage();
+
+        // Protección por saturación
+        if (vd > 4.95f)
+            vd = 4.95f;
 
         // Cuando el MOSFET empieza a conducir, VD cae
         if (vd < 4.0f)

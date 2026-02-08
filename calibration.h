@@ -1,14 +1,17 @@
 #ifndef CALIBRATION_H
 #define CALIBRATION_H
 
-#include <Arduino.h>
-#include "globals.h"
-
-// =====================================================
-// PROTOTIPOS
-// =====================================================
-
 void loadCalibration();
+void calibrateVDC();
+void calibrateVAC();
+void calibrateOHM();
+void calibrateCurrent_mA();
+void calibrateCurrent_5A();
+void calibrateCurrent_16A();
+void calibrateESR();
+void calibrateFrequency();
+void calibrateInductance();
 void enterCalibration();
+void calibrationMenu();
 
 #endif

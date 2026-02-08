@@ -1,6 +1,5 @@
 #include "matrix.h"
 #include "pcfwrapper.h"
-#include "adc.h"
 
 uint8_t matrix_pcf_state = 0;
 

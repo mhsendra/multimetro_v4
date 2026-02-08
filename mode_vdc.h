@@ -1,22 +1,34 @@
 #ifndef MODE_VDC_H
 #define MODE_VDC_H
 
-#include "config.h"   // Aquí está la enum VdcSubMode
+#include <Arduino.h>
+#include "globals.h"
 
-// Solo declaramos la variable, NO la enum
-extern VdcSubMode vdcSubMode;
+// =====================================================
+// FUNCIONES DE MEDICIÓN
+// =====================================================
+float measureVDC_raw(void);
+float measureVDC_calibrated(void);
+float measureVDC_Relative(void);
+float measurePower(void);
+float measureEnergy(void);
 
-// Prototipos
-float measureVDC();
-float measureVDC_Relative();
-float measurePower();
-float measureEnergy();
+// =====================================================
+// FUNCIONES DE PANTALLA
+// =====================================================
+void showVDC(void);
+void showVDC_Relative(void);
+void showPower(void);
+void showEnergy(void);
 
-void showVDC();
-void showVDC_Relative();
-void showPower();
-void showEnergy();
+// =====================================================
+// MODO COMPLETO VDC
+// =====================================================
+void measureVDC_MODE(void);
 
-void measureVDC_MODE();
+// =====================================================
+// UTILIDADES
+// =====================================================
+bool use_millivolts(float v);
 
-#endif
+#endif // MODE_VDC_H

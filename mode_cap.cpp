@@ -13,24 +13,27 @@
 #include "mode_current.h"
 #include "range_control.h"
 
-/* =====================================================
- * PROTECCIÓN POR VOLTAJE RESIDUAL
- * ===================================================== */
+// =====================================================
+// PROTECCIÓN POR VOLTAJE RESIDUAL
+// =====================================================
 static bool capResidualVoltageTooHigh()
 {
     adc_manager_select(RANGE_DC_20V);
-    uint16_t raw = adc_manager_read_blocking();
-    float v_adc = adc_manager_raw_to_voltage(raw);
+    int16_t raw = 0;
+    if (!adc_manager_read_raw(&raw))
+        return true;
 
-    // divisor del rango DC_20V
+    float v_adc = adc_manager_read_voltage();
+
+    // Escala del divisor para DC_20V
     float v = v_adc * 0.110f;
 
     return v > CAP_RESIDUAL_VOLT_MAX;
 }
 
-/* =====================================================
- * MEDICIÓN DE CAPACITANCIA
- * ===================================================== */
+// =====================================================
+// MEDICIÓN DE CAPACITANCIA
+// =====================================================
 float measureCapacitance()
 {
     backlight_activity();
@@ -55,8 +58,11 @@ float measureCapacitance()
 
     while (true)
     {
-        uint16_t raw = adc_manager_read_blocking();
-        float v = adc_manager_raw_to_voltage(raw);
+        int16_t raw = 0;
+        if (!adc_manager_read_raw(&raw))
+            return -3; // error lectura
+
+        float v = adc_manager_read_voltage();
 
         if (v >= CAP_THRESHOLD)
             break;
@@ -68,7 +74,7 @@ float measureCapacitance()
     unsigned long dt = micros() - tStart;
 
     // 6. Obtener resistencia según submodo
-    float R = 0;
+    float R = CAP_R_UF;
     switch (capSubMode)
     {
     case CAP_RANGE_NF:
@@ -79,9 +85,6 @@ float measureCapacitance()
         break;
     case CAP_RANGE_MF:
         R = CAP_R_MF;
-        break;
-    default:
-        R = CAP_R_UF;
         break;
     }
 
@@ -97,37 +100,36 @@ float measureCapacitance()
     return C;
 }
 
-/* =====================================================
- * ESR RAW
- * ===================================================== */
+// =====================================================
+// ESR RAW
+// =====================================================
 float measureESR_raw()
 {
     float i = measureCURRENT_calibrated();
 
-    if (i < 0.00001f)
+    if (i < 1e-5f)
         return INFINITY;
 
     return 5.0f / i; // ESR = V / I
 }
 
-/* =====================================================
- * ESR CALIBRADO
- * ===================================================== */
+// =====================================================
+// ESR CALIBRADO
+// =====================================================
 float measureESR()
 {
     float esr = measureESR_raw();
-    if (isnan(esr) || esr == INFINITY)
+    if (isnan(esr) || isinf(esr))
         return esr;
 
     return esr * cal.esr_factor;
 }
 
-/* =====================================================
- * PANTALLA CAPACITANCIA
- * ===================================================== */
+// =====================================================
+// PANTALLA CAPACITANCIA
+// =====================================================
 void showCapacitance()
 {
-    // Reset de sistemas auxiliares
     backlight_activity();
     autoHold_reset();
     autoOff_reset();
@@ -138,7 +140,6 @@ void showCapacitance()
 
     float C = measureCapacitance();
 
-    // Registrar actividad
     if (!isnan(C) && !isinf(C) && C > 0)
     {
         backlight_activity();
@@ -149,7 +150,6 @@ void showCapacitance()
     if (autoHold_update(C))
     {
         float held = autoHold_getHeldValue();
-
         lcd_ui_clear();
         lcd_ui_print("CAP (HOLD)");
         lcd_ui_setCursor(0, 1);
@@ -166,24 +166,16 @@ void showCapacitance()
         }
 
         if (capSubMode == CAP_RANGE_NF)
-        {
-            lcd_ui_printFloat(held * 1e9, 1);
-            lcd_ui_print(" nF");
-        }
+            lcd_ui_printFloat(held * 1e9, 1), lcd_ui_print(" nF");
         else if (capSubMode == CAP_RANGE_UF)
-        {
-            lcd_ui_printFloat(held * 1e6, 1);
-            lcd_ui_print(" uF");
-        }
+            lcd_ui_printFloat(held * 1e6, 1), lcd_ui_print(" uF");
         else
-        {
-            lcd_ui_printFloat(held * 1e3, 2);
-            lcd_ui_print(" mF");
-        }
+            lcd_ui_printFloat(held * 1e3, 2), lcd_ui_print(" mF");
+
         return;
     }
 
-    // --- Lectura normal ---
+    // --- LECTURA NORMAL ---
     lcd_ui_clear();
 
     if (C == -1)
@@ -199,28 +191,18 @@ void showCapacitance()
     }
 
     if (capSubMode == CAP_RANGE_NF)
-    {
-        lcd_ui_printFloat(C * 1e9, 1);
-        lcd_ui_print(" nF");
-    }
+        lcd_ui_printFloat(C * 1e9, 1), lcd_ui_print(" nF");
     else if (capSubMode == CAP_RANGE_UF)
-    {
-        lcd_ui_printFloat(C * 1e6, 1);
-        lcd_ui_print(" uF");
-    }
+        lcd_ui_printFloat(C * 1e6, 1), lcd_ui_print(" uF");
     else
-    {
-        lcd_ui_printFloat(C * 1e3, 2);
-        lcd_ui_print(" mF");
-    }
+        lcd_ui_printFloat(C * 1e3, 2), lcd_ui_print(" mF");
 }
 
-/* =====================================================
- * PANTALLA ESR
- * ===================================================== */
+// =====================================================
+// PANTALLA ESR
+// =====================================================
 void showESR()
 {
-    // Reset de sistemas auxiliares
     backlight_activity();
     autoHold_reset();
     autoOff_reset();
@@ -233,7 +215,6 @@ void showESR()
 
     float esr = measureESR();
 
-    // Registrar actividad
     if (!isnan(esr) && esr != INFINITY)
     {
         backlight_activity();
@@ -244,7 +225,6 @@ void showESR()
     if (autoHold_update(esr))
     {
         float held = autoHold_getHeldValue();
-
         lcd_ui_clear();
         lcd_ui_print("ESR (HOLD)");
         lcd_ui_setCursor(0, 1);
@@ -265,30 +245,22 @@ void showESR()
         return;
     }
 
-    // --- Lectura normal ---
+    // --- LECTURA NORMAL ---
     lcd_ui_clear();
     lcd_ui_print("ESR:");
     lcd_ui_setCursor(0, 1);
 
     if (esr == INFINITY)
-    {
         lcd_ui_print("OPEN");
-        return;
-    }
-
-    if (isnan(esr) || esr < 0)
-    {
+    else if (isnan(esr) || esr < 0)
         lcd_ui_print("ERROR");
-        return;
-    }
-
-    lcd_ui_printFloat(esr, 2);
-    lcd_ui_print(" Ohm");
+    else
+        lcd_ui_printFloat(esr, 2), lcd_ui_print(" Ohm");
 }
 
-/* =====================================================
- * API PÚBLICA DEL MODO CAP
- * ===================================================== */
+// =====================================================
+// API PÚBLICA DEL MODO CAP
+// =====================================================
 void measureCAPMode()
 {
     rng_release_for_gpio();

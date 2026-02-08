@@ -69,14 +69,17 @@ float measureHFE(uint8_t basePin, bool isNPN)
 
     pinMode(basePin, OUTPUT);
     digitalWrite(basePin, isNPN ? HIGH : LOW);
-    delay(1);
+    delayMicroseconds(100);
 
     // --- Lectura ADC usando RANGE_TRANSISTOR ---
     adc_manager_select(RANGE_TRANSISTOR);
     adc_manager_set_sps(ADC_SPS_860);
 
-    uint16_t raw = adc_manager_read_blocking();
-    float vc = adc_manager_raw_to_voltage(raw);
+    float vc = adc_manager_read_voltage();
+
+    // Protección por saturación del ADC
+    if (vc > 4.95f)
+        return NAN;
 
     pinMode(basePin, INPUT);
 

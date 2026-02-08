@@ -1,12 +1,11 @@
 #include "config.h"
 #include "pins.h"
-#include "adc.h"
 #include "filters.h"
 #include "globals.h"
 #include "lcd_ui.h"
 #include "menus.h"
 #include "calibration.h"
-
+#include "adcmanager.h"
 #include "mode_vdc.h"
 #include "mode_vac.h"
 #include "mode_ohm.h"
@@ -19,6 +18,7 @@
 #include "AutoOff.h"
 #include "lcd_setup.h"
 #include "backlight.h"
+#include "mode_PN.h"
 
 void setup()
 {
@@ -41,7 +41,7 @@ void setup()
     autoOff_reset();
     loadCalibration();
     initFilters();
-    initADC();
+    adc_manager_init();
     lcd.clear();
     lcd.print("Multímetro");
     delay(1000);
@@ -80,7 +80,7 @@ void loop()
     case MODE_DIODE_TRANS:
         backlight_activity();
         autoOff_activity();
-        measureDiodeMode(); // dispatcher real del modo diodo
+        measurePN_MODE(); // dispatcher real del modo diodo
         break;
 
     case MODE_CURR_mA:

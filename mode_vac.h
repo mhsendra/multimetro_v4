@@ -1,16 +1,26 @@
 #ifndef MODE_VAC_H
 #define MODE_VAC_H
 
-#include "config.h"   // aquí está el enum VacSubMode
+#include <Arduino.h>
+#include "globals.h"
+#include "config.h"
 
-extern VacSubMode vacSubMode;
+// =====================================================
+// FUNCIONES DE MEDICIÓN
+// =====================================================
+float measureVAC_raw(void);
+float measureVAC_calibrated(void);
+float measureVAC_Relative(void);
 
-float measureVAC();
-float measureVAC_Relative();
+// =====================================================
+// FUNCIONES DE PANTALLA
+// =====================================================
+void showVAC(void);
+void showVAC_Relative(void);
 
-void showVAC();
-void showVAC_Relative();
+// =====================================================
+// MODO COMPLETO VAC
+// =====================================================
+void measureVAC_MODE(void);
 
-void measureVAC_MODE();
-
-#endif
+#endif // MODE_VAC_H

@@ -14,9 +14,9 @@
 // Pines usados para el test
 static const uint8_t TP[2] = {pin.TP1, pin.TP2};
 
-/* =====================================================
- * MEDICIÓN DE DIODO (Vf) — ADS1115
- * ===================================================== */
+// =====================================================
+// MEDICIÓN DE DIODO (Vf) — ADS1115
+// =====================================================
 float measureDiode()
 {
     rng_release_for_gpio(); // liberar RNG para este modo
@@ -31,6 +31,15 @@ float measureDiode()
     adc_manager_select(RANGE_DC_2V);
     adc_manager_set_sps(ADC_SPS_475);
 
+    int16_t raw = 0;
+    if (!adc_manager_read_raw(&raw))
+    {
+        // Restaurar pines
+        pinMode(TP[0], INPUT);
+        pinMode(TP[1], INPUT);
+        return NAN; // error de lectura
+    }
+
     float Vf = adc_manager_read_voltage();
 
     // Restaurar pines
@@ -43,9 +52,9 @@ float measureDiode()
     return Vf;
 }
 
-/* =====================================================
- * PANTALLA
- * ===================================================== */
+// =====================================================
+// PANTALLA
+// =====================================================
 void showDiode()
 {
     backlight_activity();
@@ -87,4 +96,15 @@ void showDiode()
 
         lcd_ui_printFloat(held, 3);
         lcd_ui_print(" V");
+        return;
     }
+
+    // --- LECTURA NORMAL ---
+    lcd_ui_clear();
+    lcd_ui_print("DIODE: ");
+
+    if (Vf < 0.05f)
+        lcd_ui_print("SHORT");
+    else
+        lcd_ui_printFloat(Vf, 3), lcd_ui_print(" V");
+}

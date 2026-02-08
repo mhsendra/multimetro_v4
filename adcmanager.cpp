@@ -1,4 +1,5 @@
 #include "adcmanager.h"
+#include <Adafruit_ADS1X15.h>
 
 // =========================
 // Instancia ADS1115
@@ -154,4 +155,8 @@ void adc_manager_set_sps(adc_sps_t sps)
 {
     current_sps = sps;
     apply_sps();
+}
+float adc_manager_raw_to_voltage(int16_t raw)
+{
+    return ads.computeVolts(raw);
 }

@@ -21,8 +21,7 @@ static float freq_read_voltage()
     // Usamos el mismo canal/rango que OHM (ajusta si tienes uno específico)
     adc_manager_select(RANGE_OHM_100);
 
-    uint16_t raw = adc_manager_read_blocking();
-    float v = adc_manager_raw_to_voltage(raw);
+    float v = adc_manager_read_voltage();
 
     return v;
 }
