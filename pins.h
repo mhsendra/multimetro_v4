@@ -43,22 +43,4 @@ struct Pins
     const uint8_t PIN_ONOFF = 21; // PB7 / XTAL2
 };
 
-struct PCF
-{
-
-    // LCD (RC1602A)
-    const uint8_t LCD_DB4 = (1 << 0); // P0
-    const uint8_t LCD_DB5 = (1 << 1); // P1
-    const uint8_t LCD_DB6 = (1 << 2); // P2
-    const uint8_t LCD_DB7 = (1 << 3); // P3
-    const uint8_t LCD_RS = (1 << 4);  // P4
-    const uint8_t LCD_E = (1 << 5);   // P5
-
-    // Backlight (controlado por PN2222)
-    const uint8_t LCD_BACKLIGHT_PIN = (1 << 6); // P6
-
-    // AQY para modo Zener
-    const uint8_t ZENER_AQY = (1 << 7); // P7
-};
-
 #endif

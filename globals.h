@@ -6,10 +6,16 @@
 #include <Adafruit_ADS1X15.h>
 #include <LiquidCrystal_I2C.h>
 #include "filters.h"
+#include <PCF8574.h>
+
+#define PCF8574_ADDR 0x20 // o 0x38 segun modelo
 
 // === Pines ===
 extern Pins pin; // Struct de pines
-extern PCF pcf;  // Struct de pines del PCF8574
+
+// === PCF8574 ===
+extern PCF8574 pcf;
+extern uint8_t pcf_state;
 
 // === LCD ===
 extern LiquidCrystal_I2C lcd;

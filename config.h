@@ -150,6 +150,8 @@ enum CapSubMode
 // Umbral de continuidad (ohmios)
 #define OHM_CONT_THRESHOLD 50.0f
 
+#define PCF8574_ADDR 0x20
+
 // =====================================================
 // CALIBRACIÓN
 // =====================================================

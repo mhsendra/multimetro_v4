@@ -1,6 +1,11 @@
 #include "matrix.h"
-#include "pcfwrapper.h"
 #include "globals.h"
+#include <stdint.h>
+
+// ===============================
+// PCF8574 bit masks (shadow byte)
+// ===============================
+#define PCF_ZENER_AQY (1 << 7)
 
 void matrix_disconnect_all()
 {
@@ -10,17 +15,9 @@ void matrix_disconnect_all()
     digitalWrite(pin.SSR_HIGH, LOW);
     digitalWrite(pin.SSR_SHUNT, LOW);
 
-    // Apagar AQY por seguridad
-    uint8_t s = pcf_read();
-    s &= ~pcf.ZENER_AQY;
-    pcf_write(s);
-
-    matrix_pcf_state = s;
-}
-
-void matrix_restore()
-{
-    pcf_write(matrix_pcf_state);
+    // PCF shadow register
+    pcf_state &= ~PCF_ZENER_AQY;
+    pcf.write8(pcf_state);
 }
 
 // -------------------------------

@@ -2,7 +2,10 @@
 
 // === Pines ===
 Pins pin;
-PCF pcf;
+
+// === PCF8574 ===
+PCF8574 pcf(PCF8574_ADDR);
+uint8_t pcf_state = 0xFF; // típico: todo en HIGH al arrancar
 
 // === LCD ===
 LiquidCrystal_I2C lcd(0x27, 16, 2);
