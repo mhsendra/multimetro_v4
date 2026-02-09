@@ -9,7 +9,7 @@
 #include <EEPROM.h>
 #include <Arduino.h>
 #include "lcd_ui.h"
-#include "pins.h"
+#include "globals.h"
 
 // =====================================================
 // CARGAR CALIBRACIÓN
@@ -186,7 +186,7 @@ void calibrateInductance()
         ;
     delay(300);
 
-    float L_meas = measureInd_calibrated();
+    float L_meas = measureInductance_calibrated();
 
     if (L_meas < 0.000001f)
         L_meas = 0.000001f;

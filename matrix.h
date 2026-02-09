@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include "globals.h"
 
-// Estado actual del PCF8574 (para restaurar si hace falta)
-extern uint8_t matrix_pcf_state;
-
 // Desconecta absolutamente todo (estado seguro)
 void matrix_disconnect_all();
 

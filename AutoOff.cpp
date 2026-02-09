@@ -1,5 +1,5 @@
 #include "autoOff.h"
-#include "pins.h"
+#include "globals.h"
 #include "config.h"
 #include <Arduino.h>
 

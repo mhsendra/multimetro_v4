@@ -4,7 +4,6 @@
 #include "adcmanager.h"
 #include "lcd_ui.h"
 #include "globals.h"
-#include "pins.h"
 #include "config.h"
 #include "cap_utils.h"
 #include "auto_hold.h"

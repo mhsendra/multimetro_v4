@@ -2,7 +2,7 @@
 #include "diode_utils.h"
 #include "adcmanager.h"
 #include "lcd_ui.h"
-#include "pins.h"
+#include "globals.h"
 #include "config.h"
 #include "range_control.h"
 #include "backlight.h"

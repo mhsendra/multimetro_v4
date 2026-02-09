@@ -12,7 +12,7 @@
 
 void runCurrentMode()
 {
-    switch (currentMode)
+    switch (selectedMode)
     {
 
     case MODE_VDC:         // Posición 0
@@ -23,30 +23,30 @@ void runCurrentMode()
         measureVAC_MODE(); // Dispatcher real de VAC
         break;
 
-    case MODE_OHM_CONT: // Posición 2
-        measureOHM_MODE();   // Dispatcher real del modo ohm
+    case MEASURE_OHM_CONT: // Posición 2
+        measureOHM_MODE(); // Dispatcher real del modo ohm
         break;
 
-    case MODE_DIODE_TRANS:   // Posición 3
-        measureDiode_main(); // Dispatcher real del modo diodo
+    case MEASURE_DIODE_TRANS: // Posición 3
+        measureDiode_main();  // Dispatcher real del modo diodo
         break;
 
-    case MODE_CURR_mA: // Posición 4
+    case MEASURE_CURR_mA: // Posición 4
         currentRange = CURR_RANGE_mA;
         measureCURRENT(); // Dispatcher real de corriente
         break;
 
-    case MODE_CURR_A: // Posición 5
+    case MEASURE_CURR_A: // Posición 5
         currentRange = CURR_RANGE_5A;
         measureCURRENT(); // Dispatcher real de corriente
         break;
 
-    case MODE_CAP:    // Posición 6
+    case MEASURE_CAP:     // Posición 6
         measureCAPMode(); // Dispatcher real de capacitancia
         break;
 
-    case MODE_L:             // Posición 7
-        measureInductance(); // Dispatcher real de inductancia
+    case MEASURE_L:              // Posición 7
+        measureInductanceMode(); // Dispatcher real de inductancia
         break;
 
     default:

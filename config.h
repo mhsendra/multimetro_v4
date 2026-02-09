@@ -6,17 +6,29 @@
 // =====================================================
 // ENUMS
 // =====================================================
-typedef enum
+enum MainMode
 {
-    MODE_VDC = 0,
-    MODE_VAC = 1,
-    MODE_OHM_CONT = 2,
-    MODE_DIODE_TRANS = 3,
-    MODE_CURR_mA = 4,
-    MODE_CURR_A = 5,
-    MODE_CAP = 6,
-    MODE_L = 7
-} MeasureMode;
+    MODE_VDC,
+    MODE_VAC,
+    MODE_CURRENT,
+    MODE_OHM,
+    MODE_CAP,
+    MODE_FREQ,
+    MODE_PN,
+    MODE_INDUCT
+};
+
+enum MeasureMode
+{
+    MEASURE_VDC = 0,
+    MEASURE_VAC = 1,
+    MEASURE_OHM_CONT = 2,
+    MEASURE_DIODE_TRANS = 3,
+    MEASURE_CURR_mA = 4,
+    MEASURE_CURR_A = 5,
+    MEASURE_CAP = 6,
+    MEASURE_L = 7
+};
 
 enum PNType
 {

@@ -1,5 +1,5 @@
 #include "config.h"
-#include "pins.h"
+#include "globals.h"
 #include "filters.h"
 #include "globals.h"
 #include "lcd_ui.h"
@@ -18,7 +18,7 @@
 #include "AutoOff.h"
 #include "lcd_setup.h"
 #include "backlight.h"
-#include "mode_PN.h"
+#include "mode_dispatchers.h"
 
 void setup()
 {
@@ -49,71 +49,57 @@ void setup()
 
 void loop()
 {
+    // 1️⃣ Ejecutar el modo seleccionado
+    dispatchMode(selectedMode);
+
+    // 2️⃣ Actualizaciones de sistemas auxiliares
     backlight_update();
     autoOff_update();
 
-    // Leer selector
-    int mode = readSelector();
+    // 3️⃣ Leer selector físico y actualizar selectedMode
+    int sel = readSelector();
 
-    // Ejecutar modo
-    switch (mode)
+    switch (sel)
     {
-
-    case MODE_VDC:
-        backlight_activity();
-        autoOff_activity();
-        measureVDC_MODE();
+    case 0:
+        selectedMode = MODE_VDC;
         break;
 
-    case MODE_VAC:
-        backlight_activity();
-        autoOff_activity();
-        measureVAC_MODE();
+    case 1:
+        selectedMode = MODE_VAC;
         break;
 
-    case MODE_OHM_CONT:
-        backlight_activity();
-        autoOff_activity();
-        measureOHM_MODE(); // dispatcher real del modo ohm
+    case 2:
+        selectedMode = MODE_OHM;
         break;
 
-    case MODE_DIODE_TRANS:
-        backlight_activity();
-        autoOff_activity();
-        measurePN_MODE(); // dispatcher real del modo diodo
+    case 3:
+        selectedMode = MODE_PN; // Diodo / Transistor / Zener / MOSFET
         break;
 
-    case MODE_CURR_mA:
-        backlight_activity();
-        autoOff_activity();
-        currentRange = CURR_RANGE_mA;
-        measureCURRENT();
+    case 4:
+        selectedMode = MODE_CURRENT;
+        currentRange = CURR_RANGE_mA; // rango miliamperios
         break;
 
-    case MODE_CURR_A:
-        backlight_activity();
-        autoOff_activity();
-        currentRange = CURR_RANGE_5A;
-        measureCURRENT();
+    case 5:
+        selectedMode = MODE_CURRENT;
+        currentRange = CURR_RANGE_5A; // rango amperios
         break;
 
-    case MODE_CAP:
-        backlight_activity();
-        autoOff_activity();
-        measureCAPMode();
+    case 6:
+        selectedMode = MODE_CAP;
         break;
 
-    case MODE_L:
-        backlight_activity();
-        autoOff_activity();
-        void measureInductance();
+    case 7:
+        selectedMode = MODE_INDUCT;
         break;
 
     default:
-        lcd.clear();
-        lcd.print("Modo invalido");
+        selectedMode = MODE_VDC; // fallback seguro
         break;
     }
 
-    delay(100); // estabilidad
+    // 4️⃣ Pequeña pausa para estabilidad
+    delay(100);
 }

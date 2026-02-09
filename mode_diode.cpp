@@ -1,7 +1,7 @@
+#include "globals.h"
 #include <Arduino.h>
 #include <math.h>
 #include "mode_diode.h"
-#include "pins.h"
 #include "adcmanager.h"
 #include "lcd_ui.h"
 #include "filters.h"

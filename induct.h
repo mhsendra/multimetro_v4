@@ -1,12 +1,14 @@
-#ifndef MODE_INDUCTANCE_H
-#define MODE_INDUCTANCE_H
+#ifndef MODE_INDUCT_H
+#define MODE_INDUCT_H
 
-float measureInd_raw();
-float measureInd_calibrated();
+// --- medición ---
+float measureInductance_raw();
+float measureInductance_calibrated();
+
+// --- UI ---
 void showInductance();
-void showInductanceValue(float L);
-void measureInductance();
-void measureInd();              // ← ESTA ES LA QUE FALTABA
-float measureInductancePulse();
+
+// --- API del modo ---
+void measureInductanceMode();
 
 #endif

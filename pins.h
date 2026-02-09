@@ -43,8 +43,6 @@ struct Pins
     const uint8_t PIN_ONOFF = 21; // PB7 / XTAL2
 };
 
-extern Pins pin;
-
 struct PCF
 {
 
@@ -57,12 +55,10 @@ struct PCF
     const uint8_t LCD_E = (1 << 5);   // P5
 
     // Backlight (controlado por PN2222)
-    const uint8_t LCD_BACKLIGHT = (1 << 6); // P6
+    const uint8_t LCD_BACKLIGHT_PIN = (1 << 6); // P6
 
     // AQY para modo Zener
     const uint8_t ZENER_AQY = (1 << 7); // P7
 };
-
-extern PCF pcf;
 
 #endif

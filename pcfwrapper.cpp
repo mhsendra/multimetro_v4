@@ -1,6 +1,5 @@
 #include "pcfwrapper.h"
-
-PCF pcf; // objeto global
+#include "globals.h"
 
 // Objeto real de la librería de Tillaart
 PCF8574 expander(PCF8574_ADDR);

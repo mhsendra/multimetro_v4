@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <PCF8574.h>
-#include "pins.h" // ← Aquí está tu struct PCF original
+#include "globals.h" // ← Aquí está tu struct PCF original
 
 #define PCF8574_ADDR 0x20
 

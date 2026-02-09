@@ -1,6 +1,6 @@
 #include "cap_utils.h"
 #include "adcmanager.h"
-#include "pins.h"
+#include "globals.h"
 #include "config.h"
 
 // =====================================================

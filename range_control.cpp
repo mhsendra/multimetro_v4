@@ -1,4 +1,3 @@
-#include "pins.h"
 #include "globals.h"
 
 static bool rng_released = false;

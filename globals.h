@@ -1,69 +1,65 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "config.h"
 #include "pins.h"
+#include "config.h"
 #include <Adafruit_ADS1X15.h>
 #include <LiquidCrystal_I2C.h>
 #include "filters.h"
+
+// === Pines ===
+extern Pins pin; // Struct de pines
+extern PCF pcf;  // Struct de pines del PCF8574
+
+// === LCD ===
+extern LiquidCrystal_I2C lcd;
+
+// === Filtros ===
 extern Butterworth2 bw_vdc;
+void initFilters();
+
+// === Modos y submodos ===
+extern MainMode selectedMode;
+extern DiodeSubMode diodeSubMode;
+extern CapSubMode capSubMode;
+extern FreqSubMode freqSubMode;
+extern OhmSubMode ohmSubMode;
+extern VdcSubMode vdcSubMode;
+extern VacSubMode vacSubMode;
+extern OhmRange currentOhmRange;
+extern CurrentRange currentRange;
+
+// === Rango VDC ===
 extern float vdc_ranges[3];
 extern int vdc_range;
 extern float acsOffset;
-extern MeasureMode currentMode;
-extern OhmRange currentOhmRange;
-extern CurrentRange currentRange;
-extern FreqSubMode freqSubMode;
-extern VdcSubMode vdcSubMode;
-extern VacSubMode vacSubMode;
-extern OhmSubMode ohmSubMode;
-extern DiodeSubMode diodeSubMode;
-extern CapSubMode capSubMode;
 
-extern float energy_Wh;
-extern unsigned long lastEnergyTime;
+// === Calibración ===
+extern Calibration cal;
 
+// === Cable test ===
+extern bool cableOK;
+extern unsigned long lastBreak;
+
+// === Auto-off y backlight ===
+extern unsigned long lastActivityTime;
+extern bool autoOffActive;
+extern unsigned long lastBacklightActivity;
+extern bool backlightOff;
+
+// === Medidas y referencias ===
 extern float vdcRef;
 extern float ohmRef;
 extern float ohmMin;
 extern float ohmMax;
 
-extern bool cableOK;
-extern unsigned long lastBreak;
-
-extern Calibration cal;
-
+// === ADC ===
 extern Adafruit_ADS1115 ads;
-extern LiquidCrystal_I2C lcd;
-
-extern unsigned long lastActivityTime;
-extern bool autoOffActive;
-
-extern unsigned long lastBacklightActivity;
-extern bool backlightOff;
-
-extern unsigned long lastLcdUpdate;
-
-void initFilters();
-
-extern unsigned long lastBacklightActivity;
-extern bool backlightOff;
-extern Pins pin;
-extern PCF pcf;
-
-#define ADS1115_ADDR 0x48
-
-#define ADS_OS_SINGLE 0x8000
-#define ADS_MODE_SINGLE 0x0100
-#define ADS_COMP_QUE_DISABLE 0x0003
-
-// MUX (se rellenará según tu tabla)
 extern uint16_t ads_mux;
-
-// PGA (según rango)
 extern uint16_t ads_gain;
-
-// SPS (DR bits)
 extern uint16_t ads_sps;
+
+// Estado actual del PCF8574 (para restaurar si hace falta)
+extern uint8_t matrix_pcf_state;
 
 #endif

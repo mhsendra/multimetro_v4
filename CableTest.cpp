@@ -6,7 +6,7 @@
 #include "backlight.h"
 #include "autoOff.h"
 #include "range_control.h"
-#include "pins.h"
+#include "globals.h"
 #include "config.h"
 
 // Umbral para considerar cable OK

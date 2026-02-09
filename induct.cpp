@@ -3,7 +3,6 @@
 #include "induct.h"
 #include "mode_current.h"
 #include "globals.h"
-#include "pins.h"
 #include "lcd_ui.h"
 #include "config.h"
 #include "filters.h"

@@ -2,9 +2,10 @@
 #define ONOFF_H
 
 #include <Arduino.h>
-#include "pins.h"
+#include "globals.h"
 
-class OnOff {
+class OnOff
+{
 public:
     void begin();
     bool isOn();

@@ -2,15 +2,12 @@
 #include "globals.h"
 
 // =====================================================
-// INSTANCIA GLOBAL DEL BUTTERWORTH
-// =====================================================
-Butterworth2 bw_vdc;
-
-// =====================================================
 // EMA
 // =====================================================
-float applyEMA(float x, float &state, float alpha) {
-    if (state < -1e8) {
+float applyEMA(float x, float &state, float alpha)
+{
+    if (state < -1e8)
+    {
         state = x;
         return x;
     }
@@ -21,14 +18,16 @@ float applyEMA(float x, float &state, float alpha) {
 // =====================================================
 // RMS MÓVIL
 // =====================================================
-float movingRMS(float x) {
+float movingRMS(float x)
+{
     static float acc = 0;
     static int count = 0;
 
     acc += x * x;
     count++;
 
-    if (count >= 50) {
+    if (count >= 50)
+    {
         float rms = sqrt(acc / count);
         acc = 0;
         count = 0;
@@ -41,13 +40,29 @@ float movingRMS(float x) {
 // =====================================================
 // MEDIANA DE 3
 // =====================================================
-float median3(float a, float b, float c) {
+float median3(float a, float b, float c)
+{
     float m;
 
     // Ordenar a, b, c sin usar swap()
-    if (a > b) { float t = a; a = b; b = t; }
-    if (b > c) { float t = b; b = c; c = t; }
-    if (a > b) { float t = a; a = b; b = t; }
+    if (a > b)
+    {
+        float t = a;
+        a = b;
+        b = t;
+    }
+    if (b > c)
+    {
+        float t = b;
+        b = c;
+        c = t;
+    }
+    if (a > b)
+    {
+        float t = a;
+        a = b;
+        b = t;
+    }
 
     return b;
 }
@@ -55,13 +70,15 @@ float median3(float a, float b, float c) {
 // =====================================================
 // BUTTERWORTH WRAPPER
 // =====================================================
-float applyButterworth(Butterworth2 &f, float x) {
+float applyButterworth(Butterworth2 &f, float x)
+{
     return f.update(x);
 }
 
 // =====================================================
 // INICIALIZACIÓN DE FILTROS
 // =====================================================
-void initFilters() {
+void initFilters()
+{
     bw_vdc.reset();
 }

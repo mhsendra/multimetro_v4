@@ -1,41 +1,54 @@
 #include "globals.h"
-#include "filters.h"
-#include "pins.h"
-#include <Adafruit_ADS1X15.h>
-#include <LiquidCrystal_I2C.h>
-float vdc_ranges[3] = {2.0f, 20.0f, 200.0f};
-int vdc_range = 0;
 
-float acsOffset = 0.0f;
-
-// ===============================
-// DEFINICIÓN DE VARIABLES GLOBALES
-// ===============================
-
-// Pines
+// === Pines ===
 Pins pin;
+PCF pcf;
 
-// Calibración
-Calibration cal;
+// === LCD ===
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+// === Filtros ===
+Butterworth2 bw_vdc;
 
-// ADC ADS1115
-Adafruit_ADS1115 ads;
-
-// Rangos
-OhmRange currentOhmRange = OHM_RANGE_MID;
-CurrentRange currentRange = CURR_RANGE_mA;
-CapSubMode capSubMode = CAP_RANGE_UF;
+// === Modos y submodos ===
+MainMode selectedMode = MODE_VDC;
 DiodeSubMode diodeSubMode = DIODE_MAIN;
+CapSubMode capSubMode = CAP_RANGE_UF;
+FreqSubMode freqSubMode = FREQ_MAIN;
+OhmSubMode ohmSubMode = OHM_MAIN;
 VdcSubMode vdcSubMode = VDC_MAIN;
 VacSubMode vacSubMode = VAC_MAIN;
+OhmRange currentOhmRange = OHM_RANGE_MID;
+CurrentRange currentRange = CURR_RANGE_mA;
 
-// Auto-off y backlight
+// === Rango VDC ===
+float vdc_ranges[3] = {2.0f, 20.0f, 200.0f};
+int vdc_range = 0;
+float acsOffset = 0.0f;
+
+// === Calibración ===
+Calibration cal;
+
+// === Cable test ===
+bool cableOK = false;
+unsigned long lastBreak = 0;
+
+// === Auto-off y backlight ===
 unsigned long lastActivityTime = 0;
-unsigned long lastBacklightActivity = 0;
 bool autoOffActive = true;
+unsigned long lastBacklightActivity = 0;
 bool backlightOff = false;
 
-// Submodo OHM por defecto
-OhmSubMode ohmSubMode = OHM_MAIN;
-// Valor de referencia para modo REL
+// === Medidas y referencias ===
+float vdcRef = 0.0f;
 float ohmRef = NAN;
+float ohmMin = 0.0f;
+float ohmMax = 0.0f;
+
+// === ADC ===
+Adafruit_ADS1115 ads;
+uint16_t ads_mux = 0;
+uint16_t ads_gain = 0;
+uint16_t ads_sps = 0;
+
+// Estado actual del PCF8574 (para restaurar si hace falta)
+uint8_t matrix_pcf_state = 0;

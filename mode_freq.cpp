@@ -2,7 +2,6 @@
 #include "adcmanager.h"
 #include "lcd_ui.h"
 #include "globals.h"
-#include "pins.h"
 #include "config.h"
 #include "auto_Hold.h"
 #include "backlight.h"
