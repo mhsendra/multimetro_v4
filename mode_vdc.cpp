@@ -30,14 +30,11 @@ bool use_millivolts(float v)
 // =====================================================
 float measureVDC_raw(void)
 {
-    // Leer voltaje directamente del ADS1115
     float v_adc = adc_manager_read_voltage();
 
-    // Saturación / overflow del ADC externo
-    if (fabs(v_adc) > 4.09f) // cerca del full-scale del ADS1115
+    if (fabs(v_adc) > 4.09f)
         return INFINITY;
 
-    // Escalado según el rango actual del ADC
     adc_range_id_t r = adc_manager_current_range();
     float scale = 1.0f;
 
@@ -67,7 +64,6 @@ float measureVDC_calibrated(void)
     float v = measureVDC_raw();
     if (isinf(v))
         return v;
-
     return v * cal.vdc;
 }
 
@@ -79,10 +75,8 @@ static float vdc_reference = NAN;
 float measureVDC_Relative(void)
 {
     float v = measureVDC_calibrated();
-
     if (isnan(vdc_reference))
         vdc_reference = v;
-
     return v - vdc_reference;
 }
 
@@ -96,7 +90,6 @@ float measurePower(void)
 
     if (isinf(v) || isinf(i))
         return INFINITY;
-
     return v * i;
 }
 
@@ -116,7 +109,7 @@ float measureEnergy(void)
         return energy_Wh;
     }
 
-    float dt_h = (now - lastEnergyUpdate) / 3600000.0f; // tiempo en horas
+    float dt_h = (now - lastEnergyUpdate) / 3600000.0f;
     float p = measurePower();
 
     if (!isinf(p))
@@ -132,7 +125,6 @@ float measureEnergy(void)
 void showVDC(void)
 {
     float v = measureVDC_calibrated();
-
     if (autoHold_update(v))
         v = autoHold_getHeldValue();
 
@@ -212,13 +204,11 @@ void showEnergy(void)
 // =====================================================
 void measureVDC_MODE(void)
 {
-    // Liberar pines RNGx si se venían usando en modo OHM
     rng_release_for_gpio();
 
     backlight_activity();
     autoOff_activity();
 
-    // Seleccionar rango ADC adecuado (20V por defecto, auto-rango puede implementarse si quieres)
     adc_manager_select(RANGE_DC_20V);
 
     switch (vdcSubMode)
@@ -236,12 +226,10 @@ void measureVDC_MODE(void)
         showEnergy();
         break;
     case VDC_CURRENT_EST:
-    {
         lcd_ui_clear(&lcd);
         lcd_driver_print(&lcd, "I est: ");
         lcd_driver_printFloat(&lcd, measureCURRENT_calibrated() * 1000.0f, 1);
         lcd_driver_print(&lcd, " mA");
-    }
-    break;
+        break;
     }
 }

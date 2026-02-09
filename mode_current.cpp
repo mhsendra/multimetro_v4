@@ -6,6 +6,7 @@
 #include "backlight.h"
 #include "AutoOff.h"
 #include "range_control.h"
+#include <math.h>
 
 // =====================================================
 // CORRIENTE mA y 5A (shunt + LM358 → ADS1115 canal shunt)
@@ -14,13 +15,9 @@ static float measureCurrent_Shunt_RAW(void)
 {
     // Seleccionar rango ADC según rango lógico
     if (currentRange == CURR_RANGE_mA)
-    {
         adc_manager_select(RANGE_CURR_20mA);
-    }
     else // CURR_RANGE_5A
-    {
         adc_manager_select(RANGE_CURR_200mA);
-    }
 
     // Leer voltaje directamente del ADS1115
     float v = adc_manager_read_voltage();
@@ -33,9 +30,7 @@ static float measureCurrent_Shunt_RAW(void)
     v -= cal.curr_shunt_offset;
 
     // Convertir a corriente (A)
-    float i = v * cal.curr_shunt_gain;
-
-    return i;
+    return v * cal.curr_shunt_gain;
 }
 
 // =====================================================
@@ -55,9 +50,7 @@ static float measureCurrent_ACS_RAW(void)
     v -= cal.acs_offset;
 
     // Convertir a corriente (A)
-    float i = v / cal.acs_sens;
-
-    return i;
+    return v / cal.acs_sens;
 }
 
 // =====================================================

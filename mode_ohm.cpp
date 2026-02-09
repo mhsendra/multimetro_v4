@@ -96,8 +96,7 @@ static float ohm_check_voltage(void)
 {
     adc_manager_select(RANGE_DC_20V);
     float v_adc = adc_manager_read_voltage();
-    float v = v_adc * 0.110f; // mismo factor que antes
-    return v;
+    return v_adc * 0.110f;
 }
 
 static void showOHM_Protect(void)
@@ -112,26 +111,20 @@ static void showOHM_Protect(void)
 static float measureOHM_raw(void)
 {
     float v_adc = adc_manager_read_voltage();
-
     if (fabs(v_adc) > 4.95f)
         return INFINITY;
 
-    float R = NAN;
     switch (adc_manager_current_range())
     {
     case RANGE_OHM_100:
-        R = v_adc / I_TEST_100;
-        break;
+        return v_adc / I_TEST_100;
     case RANGE_OHM_10K:
-        R = v_adc / I_TEST_10K;
-        break;
+        return v_adc / I_TEST_10K;
     case RANGE_OHM_1M:
-        R = v_adc / I_TEST_1M;
-        break;
+        return v_adc / I_TEST_1M;
     default:
         return NAN;
     }
-    return R;
 }
 
 // =====================================================
@@ -175,7 +168,6 @@ static void showOhmRelative(float R, adc_range_id_t range)
 {
     if (isnan(ohmRef))
         ohmRef = R;
-
     float diff = R - ohmRef;
     if (autoHold_update(diff))
         diff = autoHold_getHeldValue();
@@ -209,6 +201,7 @@ static void showOhmMain(float R, adc_range_id_t range)
 {
     if (autoHold_update(R))
         R = autoHold_getHeldValue();
+
     lcd_ui_clear(&lcd);
     lcd_driver_printFloat(&lcd, R, 1);
     lcd_driver_print(&lcd, " Ohm ");

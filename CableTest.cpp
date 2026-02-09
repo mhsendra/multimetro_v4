@@ -17,7 +17,6 @@ static constexpr float CABLE_MAX_R = 5.0f;
  * ===================================================== */
 float measureCable()
 {
-    // Medición de resistencia del cable
     float R = measureOhmValue();
 
     if (R < 0 || isnan(R))
@@ -37,7 +36,7 @@ void showCable()
     autoOff_reset();
 
     lcd_ui_clear(&lcd);
-    lcd_driver_print(&lcd, "Detectando...");
+    lcd_printAt(&lcd, 0, 0, "Detectando...");
     delay(200);
 
     float R = measureCable();
@@ -49,58 +48,60 @@ void showCable()
         autoOff_activity();
     }
 
-    // --- AUTO HOLD ---
+    // =================================================
+    // AUTO HOLD
+    // =================================================
     if (autoHold_update(R))
     {
         float held = autoHold_getHeldValue();
 
         lcd_ui_clear(&lcd);
-        lcd_driver_print(&lcd, "CABLE (HOLD)");
-        lcd_ui_setCursor(&lcd, 0, 1);
+        lcd_printAt(&lcd, 0, 0, "CABLE (HOLD)");
 
         if (isnan(held))
         {
-            lcd_driver_print(&lcd, "ERROR");
+            lcd_printAt(&lcd, 0, 1, "ERROR");
             return;
         }
 
         if (held <= CABLE_MAX_R)
         {
-            lcd_driver_print(&lcd, "OK  (");
-            lcd_driver_printFloat(&lcd, held, 2);
-            lcd_driver_print(&lcd, " Ohm)");
+            lcd_printAt(&lcd, 0, 1, "OK  (");
+            lcd_printFloatAt(&lcd, 5, 1, held, 2);
+            lcd_printAt(&lcd, 10, 1, " Ohm)");
         }
         else
         {
-            lcd_driver_print(&lcd, "BREAK (");
-            lcd_driver_printFloat(&lcd, held, 2);
-            lcd_driver_print(&lcd, " Ohm)");
+            lcd_printAt(&lcd, 0, 1, "BREAK (");
+            lcd_printFloatAt(&lcd, 7, 1, held, 2);
+            lcd_printAt(&lcd, 12, 1, " Ohm)");
         }
         return;
     }
 
-    // --- Lectura normal ---
+    // =================================================
+    // LECTURA NORMAL
+    // =================================================
     lcd_ui_clear(&lcd);
-    lcd_driver_print(&lcd, "CABLE");
-    lcd_ui_setCursor(&lcd, 0, 1);
+    lcd_printAt(&lcd, 0, 0, "CABLE");
 
     if (isnan(R))
     {
-        lcd_driver_print(&lcd, "ERROR");
+        lcd_printAt(&lcd, 0, 1, "ERROR");
         return;
     }
 
     if (R <= CABLE_MAX_R)
     {
-        lcd_driver_print(&lcd, "OK  (");
-        lcd_driver_printFloat(&lcd, R, 2);
-        lcd_driver_print(&lcd, " Ohm)");
+        lcd_printAt(&lcd, 0, 1, "OK  (");
+        lcd_printFloatAt(&lcd, 5, 1, R, 2);
+        lcd_printAt(&lcd, 10, 1, " Ohm)");
     }
     else
     {
-        lcd_driver_print(&lcd, "BREAK (");
-        lcd_driver_printFloat(&lcd, R, 2);
-        lcd_driver_print(&lcd, " Ohm)");
+        lcd_printAt(&lcd, 0, 1, "BREAK (");
+        lcd_printFloatAt(&lcd, 7, 1, R, 2);
+        lcd_printAt(&lcd, 12, 1, " Ohm)");
     }
 }
 

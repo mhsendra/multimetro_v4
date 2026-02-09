@@ -17,12 +17,10 @@ static float freq_read_voltage()
     // Permite liberar 3 pines RNGx para uso fuera MODE OHM
     rng_release_for_gpio();
 
-    // Usamos el mismo canal/rango que OHM (ajusta si tienes uno específico)
+    // Usamos el mismo canal/rango que OHM
     adc_manager_select(RANGE_OHM_100);
 
-    float v = adc_manager_read_voltage();
-
-    return v;
+    return adc_manager_read_voltage();
 }
 
 // =====================================================
@@ -35,37 +33,25 @@ float measureFrequency_raw()
 
     unsigned long tStart = micros();
 
-    // Esperar flanco ascendente inicial (baja -> alta)
     while (freq_read_voltage() < TH)
-    {
         if (micros() - tStart > TIMEOUT)
             return 0.0f;
-    }
     while (freq_read_voltage() > TH)
-    {
         if (micros() - tStart > TIMEOUT)
             return 0.0f;
-    }
-
-    // Primer flanco ascendente
     while (freq_read_voltage() < TH)
-    {
         if (micros() - tStart > TIMEOUT)
             return 0.0f;
-    }
+
     unsigned long t1 = micros();
 
-    // Segundo flanco ascendente
     while (freq_read_voltage() > TH)
-    {
         if (micros() - t1 > TIMEOUT)
             return 0.0f;
-    }
     while (freq_read_voltage() < TH)
-    {
         if (micros() - t1 > TIMEOUT)
             return 0.0f;
-    }
+
     unsigned long t2 = micros();
 
     float period_us = (float)(t2 - t1);
@@ -96,40 +82,28 @@ float measureDutyCycle()
 
     unsigned long tStart = micros();
 
-    // Esperar flanco ascendente inicial
     while (freq_read_voltage() < TH)
-    {
         if (micros() - tStart > TIMEOUT)
             return 0.0f;
-    }
     while (freq_read_voltage() > TH)
-    {
         if (micros() - tStart > TIMEOUT)
             return 0.0f;
-    }
-
-    // Flanco ascendente
     while (freq_read_voltage() < TH)
-    {
         if (micros() - tStart > TIMEOUT)
             return 0.0f;
-    }
+
     unsigned long tRise = micros();
 
-    // Flanco descendente
     while (freq_read_voltage() > TH)
-    {
         if (micros() - tRise > TIMEOUT)
             return 0.0f;
-    }
+
     unsigned long tFall = micros();
 
-    // Segundo flanco ascendente
     while (freq_read_voltage() < TH)
-    {
         if (micros() - tRise > TIMEOUT)
             return 0.0f;
-    }
+
     unsigned long tNextRise = micros();
 
     float high_us = (float)(tFall - tRise);
@@ -151,20 +125,16 @@ float measurePulseWidth()
 
     unsigned long tStart = micros();
 
-    // Esperar flanco ascendente
     while (freq_read_voltage() < TH)
-    {
         if (micros() - tStart > TIMEOUT)
             return 0.0f;
-    }
+
     unsigned long tRise = micros();
 
-    // Esperar flanco descendente
     while (freq_read_voltage() > TH)
-    {
         if (micros() - tRise > TIMEOUT)
             return 0.0f;
-    }
+
     unsigned long tFall = micros();
 
     return (float)(tFall - tRise);
@@ -259,8 +229,7 @@ void measureFREQ()
     backlight_activity();
     autoOff_activity();
 
-    // Máxima velocidad del ADS para este modo
-    adc_manager_set_sps(ADC_SPS_860);
+    adc_manager_set_sps(ADC_SPS_860); // Máxima velocidad
 
     switch (freqSubMode)
     {

@@ -24,10 +24,8 @@ float measureVAC_raw(void)
 
     for (int i = 0; i < N; i++)
     {
-        // Leer voltaje directamente del ADS1115
         float v = adc_manager_read_voltage();
 
-        // Protección por saturación
         if (fabs(v) > 4.95f)
             return INFINITY;
 
@@ -36,7 +34,6 @@ float measureVAC_raw(void)
 
     float rms = sqrtf(sumSq / N);
 
-    // Escalado según rango AC
     float scale = 1.0f;
     switch (adc_manager_current_range())
     {
@@ -64,7 +61,6 @@ float measureVAC_calibrated(void)
     float v = measureVAC_raw();
     if (isinf(v))
         return v;
-
     return v * cal.vac;
 }
 
@@ -78,7 +74,6 @@ float measureVAC_Relative(void)
     float v = measureVAC_calibrated();
     if (isnan(vac_reference))
         vac_reference = v;
-
     return v - vac_reference;
 }
 
@@ -88,12 +83,10 @@ float measureVAC_Relative(void)
 static bool use_millivolts_vac(float v)
 {
     static bool in_mV = false;
-
     if (v < 0.95f)
         in_mV = true;
     if (v > 1.05f)
         in_mV = false;
-
     return in_mV;
 }
 
@@ -114,15 +107,14 @@ void showVAC(void)
         return;
     }
 
+    lcd_driver_print(&lcd, "VAC: ");
     if (use_millivolts_vac(v))
     {
-        lcd_driver_print(&lcd, "VAC: ");
         lcd_driver_printFloat(&lcd, v * 1000.0f, 1);
         lcd_driver_print(&lcd, " mV");
     }
     else
     {
-        lcd_driver_print(&lcd, "VAC: ");
         lcd_driver_printFloat(&lcd, v, 3);
         lcd_driver_print(&lcd, " V");
     }
@@ -139,15 +131,14 @@ void showVAC_Relative(void)
         return;
     }
 
+    lcd_driver_print(&lcd, "REL AC: ");
     if (use_millivolts_vac(fabs(v)))
     {
-        lcd_driver_print(&lcd, "REL AC: ");
         lcd_driver_printFloat(&lcd, v * 1000.0f, 1);
         lcd_driver_print(&lcd, " mV");
     }
     else
     {
-        lcd_driver_print(&lcd, "REL AC: ");
         lcd_driver_printFloat(&lcd, v, 3);
         lcd_driver_print(&lcd, " V");
     }
@@ -158,31 +149,19 @@ void showVAC_Relative(void)
 // =====================================================
 void measureVAC_MODE(void)
 {
-    // Liberar pines RNGx si se venían usando en modo OHM
     rng_release_for_gpio();
 
-    // Actividad de usuario
     backlight_activity();
     autoOff_activity();
 
-    // Configurar velocidad del ADC
     adc_manager_set_sps(ADC_SPS_250);
-
-    // Selección de rango inicial (puede mejorarse con auto-rango)
     adc_manager_select(RANGE_AC_20V);
 
     switch (vacSubMode)
     {
     case VAC_MAIN:
-    {
-        float v = measureVAC_calibrated();
-
-        if (autoHold_update(v))
-            v = autoHold_getHeldValue();
-
         showVAC();
         break;
-    }
 
     case VAC_REL:
         showVAC_Relative();
