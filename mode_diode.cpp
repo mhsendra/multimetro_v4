@@ -7,7 +7,6 @@
 #include "filters.h"
 #include "auto_hold.h"
 #include "backlight.h"
-#include "autoOff.h"
 #include "config.h"
 #include "range_control.h"
 
@@ -59,7 +58,6 @@ void showDiode()
 {
     backlight_activity();
     autoHold_reset();
-    autoOff_reset();
 
     lcd_ui_clear(&lcd);
     lcd_driver_print(&lcd, "Detectando...");
@@ -70,7 +68,6 @@ void showDiode()
     if (!isnan(Vf))
     {
         backlight_activity();
-        autoOff_activity();
     }
 
     // --- AUTO HOLD ---

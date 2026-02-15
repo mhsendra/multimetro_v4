@@ -81,4 +81,6 @@ float applyButterworth(Butterworth2 &f, float x)
 void initFilters()
 {
     bw_vdc.reset();
+    bw_vac.reset();
+    bw_current.reset();
 }

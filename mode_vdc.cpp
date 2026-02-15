@@ -6,7 +6,6 @@
 #include "auto_Hold.h"
 #include "mode_current.h"
 #include "backlight.h"
-#include "AutoOff.h"
 #include "range_control.h"
 #include <math.h>
 
@@ -64,7 +63,20 @@ float measureVDC_calibrated(void)
     float v = measureVDC_raw();
     if (isinf(v))
         return v;
-    return v * cal.vdc;
+
+    // ------------------------------
+    // Aplicar filtros
+    // ------------------------------
+    float v_scaled = v * cal.vdc;
+
+    // EMA principal
+    filter_vdc = applyEMA(v_scaled, filter_vdc, filter_alpha);
+
+    // Opcional: Butterworth
+    float v_butter = applyButterworth(bw_vdc, v_scaled);
+
+    // Retornamos EMA filtrado como valor principal
+    return filter_vdc;
 }
 
 // =====================================================
@@ -77,24 +89,34 @@ float measureVDC_Relative(void)
     float v = measureVDC_calibrated();
     if (isnan(vdc_reference))
         vdc_reference = v;
+
     return v - vdc_reference;
 }
 
 // =====================================================
-// POWER (W)
+// POWER FILTRADA (W)
 // =====================================================
+static float filter_power = -1e9; // EMA de potencia
+
 float measurePower(void)
 {
-    float v = measureVDC_calibrated();
-    float i = measureCURRENT_calibrated();
+    // Tomar V y I filtrados
+    float v = filter_vdc;     // ya filtrado por EMA de VDC
+    float i = filter_current; // ya filtrado por EMA de corriente
 
     if (isinf(v) || isinf(i))
         return INFINITY;
-    return v * i;
+
+    float p = v * i;
+
+    // Suavizado adicional opcional de la potencia
+    filter_power = applyEMA(p, filter_power, filter_alpha);
+
+    return filter_power;
 }
 
 // =====================================================
-// ENERGY (Wh)
+// ENERGY FILTRADA (Wh)
 // =====================================================
 static unsigned long lastEnergyUpdate = 0;
 static float energy_Wh = 0;
@@ -109,9 +131,13 @@ float measureEnergy(void)
         return energy_Wh;
     }
 
+    // Tiempo en horas desde la última actualización
     float dt_h = (now - lastEnergyUpdate) / 3600000.0f;
+
+    // Tomar potencia filtrada
     float p = measurePower();
 
+    // Acumular energía si la potencia es válida
     if (!isinf(p))
         energy_Wh += p * dt_h;
 
@@ -207,7 +233,6 @@ void measureVDC_MODE(void)
     rng_release_for_gpio();
 
     backlight_activity();
-    autoOff_activity();
 
     adc_manager_select(RANGE_DC_20V);
 
