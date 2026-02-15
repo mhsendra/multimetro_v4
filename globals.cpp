@@ -1,57 +1,71 @@
 #include "globals.h"
 
-// === Pines ===
+// Objetos hardware
+// PCF8574 pcf8574(PCF8574_ADDR);
+PCF8574 pcf8574;
+Adafruit_MCP23X17 mcp23017;
+
+// Wrappers
+IOExpanderPCF8574 pcfExpander(&pcf8574, I2C_ADDR_PCF8574);
+IOExpanderMCP23017 mcpExpander(&mcp23017, I2C_ADDR_MCP23017);
+
+// Punteros a expanders
+IOExpander *expanders[2] = {&pcfExpander, &mcpExpander};
+
+// Otros globals
 Pins pin;
+MCP_Pins mcpPin;
 
-// === PCF8574 ===
-PCF8574 pcf(PCF8574_ADDR);
-uint8_t pcf_state = 0xFF; // típico: todo en HIGH al arrancar
+float vdcRef = 0;
+float ohmRef = 0;
+float ohmMin = 0;
+float ohmMax = 0;
 
-// Definición del LCD global
 LCD_Handle lcd;
-// === Filtros ===
+
+float filter_vdc = 0;
+float filter_current = 0;
+float filter_ohm = 0;
+float filter_continuity = 0;
+float filter_alpha = 0;
+
 Butterworth2 bw_vdc;
+Butterworth2 bw_vac;
+Butterworth2 bw_current;
 
-// === Modos y submodos ===
-MainMode selectedMode = MODE_VDC;
-DiodeSubMode diodeSubMode = DIODE_MAIN;
-CapSubMode capSubMode = CAP_RANGE_UF;
-FreqSubMode freqSubMode = FREQ_MAIN;
-OhmSubMode ohmSubMode = OHM_MAIN;
-VdcSubMode vdcSubMode = VDC_MAIN;
-VacSubMode vacSubMode = VAC_MAIN;
-OhmRange currentOhmRange = OHM_RANGE_MID;
-CurrentRange currentRange = CURR_RANGE_mA;
+MainMode selectedMode = MODE_OFF;
+DiodeSubMode diodeSubMode = DIODE_SUBMODE_NONE;
+CapSubMode capSubMode = CAP_SUBMODE_NONE;
+FreqSubMode freqSubMode = FREQ_SUBMODE_NONE;
+OhmSubMode ohmSubMode = OHM_SUBMODE_NONE;
+VdcSubMode vdcSubMode = VDC_SUBMODE_NONE;
+VacSubMode vacSubMode = VAC_SUBMODE_NONE;
+OhmRange currentOhmRange = OHM_RANGE_AUTO;
+CurrentRange currentRange = CURRENT_RANGE_AUTO;
 
-// === Rango VDC ===
-float vdc_ranges[3] = {2.0f, 20.0f, 200.0f};
+uint8_t pcf_state = 0;
+uint8_t matrix_pcf_state = 0;
+
+ExpanderSelector selector;
+
+float vac_rms_accum = 0;
+float vac_rms_alpha = 0;
+
+float vdc_ranges[3] = {0};
 int vdc_range = 0;
-float acsOffset = 0.0f;
+float acsOffset = 0;
 
-// === Calibración ===
 Calibration cal;
 
-// === Cable test ===
 bool cableOK = false;
 unsigned long lastBreak = 0;
 
-// === Auto-off y backlight ===
 unsigned long lastActivityTime = 0;
-bool autoOffActive = true;
+bool autoOffActive = false;
 unsigned long lastBacklightActivity = 0;
 bool backlightOff = false;
 
-// === Medidas y referencias ===
-float vdcRef = 0.0f;
-float ohmRef = NAN;
-float ohmMin = 0.0f;
-float ohmMax = 0.0f;
-
-// === ADC ===
 Adafruit_ADS1115 ads;
 uint16_t ads_mux = 0;
 uint16_t ads_gain = 0;
 uint16_t ads_sps = 0;
-
-// Estado actual del PCF8574 (para restaurar si hace falta)
-uint8_t matrix_pcf_state = 0;

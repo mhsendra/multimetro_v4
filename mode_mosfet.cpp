@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "autoOff.h"
 #include "mode_mosfet.h"
 #include "adcmanager.h"
 #include "lcd_ui.h"

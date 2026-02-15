@@ -17,7 +17,10 @@ void matrix_disconnect_all()
 
     // PCF shadow register
     pcf_state &= ~PCF_ZENER_AQY;
-    pcf.write8(pcf_state);
+    for (uint8_t i = 0; i < 8; i++)
+    {
+        pcfExpander.digitalWrite(i, (pcf_state >> i) & 0x01);
+    }
 }
 
 // -------------------------------

@@ -8,6 +8,7 @@
 // =====================================================
 enum MainMode
 {
+    MODE_OFF = 0,
     MODE_VDC,
     MODE_VAC,
     MODE_CURRENT,
@@ -150,7 +151,15 @@ enum CapSubMode
 // Umbral de continuidad (ohmios)
 #define OHM_CONT_THRESHOLD 50.0f
 
-#define PCF8574_ADDR 0x20
+// config.h
+
+// Direcciones I2C
+#define I2C_ADDR_PCF8574 0x20
+#define I2C_ADDR_MCP23017 0x21
+#define I2C_ADDR_LCD 0x27
+
+#define LCD_COLS 16
+#define LCD_ROWS 2
 
 // =====================================================
 // CALIBRACIÓN

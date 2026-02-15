@@ -42,5 +42,10 @@ struct Pins
     const uint8_t PIN_CAL = 20;   // PB6 / XTAL1
     const uint8_t PIN_ONOFF = 21; // PB7 / XTAL2
 };
+struct MCP_Pins
+{
+    uint8_t BOOST_HV_CTRL = 0;
+    uint8_t NCV = 1;
+};
 
 #endif

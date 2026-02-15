@@ -1,4 +1,5 @@
 #include "mode_ohm.h"
+#include "autoOff.h"
 #include "adcmanager.h"
 #include "globals.h"
 #include "lcd_ui.h"

@@ -4,7 +4,7 @@
 // Inicializa el LCD
 void lcd_ui_setup(LCD_Handle *handle)
 {
-    lcd_driver_init(handle, LCD_ADDR, LCD_COLS, LCD_ROWS);
+    lcd_driver_init(handle, I2C_ADDR_LCD, LCD_COLS, LCD_ROWS);
 }
 
 // Limpia la pantalla

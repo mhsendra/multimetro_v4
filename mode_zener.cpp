@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "autoOff.h"
 #include "mode_zener.h"
 #include "adcmanager.h"
 #include "lcd_ui.h"
@@ -7,6 +8,7 @@
 #include "globals.h"
 #include "range_control.h"
 #include "config.h"
+#include "io_expander_mcp23017.h"
 
 /* =====================================================
  * CONFIGURACIÓN DEL DIVISOR PARA ZENER
@@ -14,23 +16,35 @@
 // RUP = 100k, RDOWN = 22k  → factor ≈ 0.18
 static constexpr float ZENER_DIV_FACTOR = (22.0f / (100.0f + 22.0f));
 
+// Índice del pin BOOST_HV_CTRL en el MCP23017
+#define BOOST_HV_CTRL 0
+
+void setupExpanders()
+{
+    mcpExpander.begin();
+    pcf8574.begin();
+
+    // Configura pines
+    mcp23017.pinMode(0, OUTPUT);
+    pcfExpander.pinMode(0, OUTPUT);
+}
+
 /* =====================================================
  * CONTROL DEL BOOSTER
  * ===================================================== */
 static inline void booster_set_5V()
 {
-    digitalWrite(pin.BOOST_HV_CTRL, HIGH); // MOSFET ON → 5V
+    mcpExpander.digitalWrite(BOOST_HV_CTRL, HIGH); // MOSFET ON → 5V
 }
 
 static inline void booster_set_24V()
 {
-    digitalWrite(pin.BOOST_HV_CTRL, LOW); // MOSFET OFF → 24V
+    mcpExpander.digitalWrite(BOOST_HV_CTRL, LOW); // MOSFET OFF → 24V
 }
 
 static inline void booster_init()
 {
-    pinMode(pin.BOOST_HV_CTRL, OUTPUT);
-    booster_set_5V(); // modo seguro al arrancar
+    mcpExpander.digitalWrite(BOOST_HV_CTRL, HIGH); // modo seguro al arrancar
 }
 
 /* =====================================================
@@ -77,11 +91,12 @@ float measureZener()
 }
 
 /* =====================================================
- * PANTALLA
+ * PANTALLA Y AUTO HOLD
  * ===================================================== */
 void mode_zener_run()
 {
-    booster_init(); // asegurar estado inicial
+    mcpExpander.begin(); // inicializa MCP23017
+    booster_init();      // asegurar estado inicial
 
     backlight_activity();
     autoHold_reset();

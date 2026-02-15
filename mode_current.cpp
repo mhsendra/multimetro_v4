@@ -1,4 +1,5 @@
 #include "mode_current.h"
+#include "autoOff.h"
 #include "adcmanager.h"
 #include "lcd_ui.h"
 #include "globals.h"

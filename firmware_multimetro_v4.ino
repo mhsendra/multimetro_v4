@@ -1,132 +1,78 @@
-#include "config.h"
 #include "globals.h"
-#include "filters.h"
-#include "globals.h"
-#include "lcd_ui.h"
-#include "lcd_driver.h"
-#include "menus.h"
-#include "calibration.h"
-#include "adcmanager.h"
-#include "mode_vdc.h"
-#include "mode_vac.h"
-#include "mode_ohm.h"
-#include "mode_current.h"
-#include "mode_cap.h"
-#include "mode_freq.h"
-#include "mode_diode.h"
-#include "mode_zener.h"
-#include "induct.h"
-#include "AutoOff.h"
-#include "backlight.h"
-#include "mode_dispatchers.h"
-#include "selector.h"
-#include "io_expander_pcf8574.h"
-// #include "io_expander_mcp23017.h"
+
+// Prototipos
+void loadCalibration();
+void adc_manager_init();
+void backlight_update();
+void autoOff_update();
 
 void setup()
 {
-    // =====================================================
-    // SELECCIÓN DE EXPANSOR (elige UNO)
-    // =====================================================
+    Serial.begin(115200);
 
-    // ---- PCF8574 ----
-    PCF8574Expander pcf8574(0x20);
-    IOExpander *ioExpander = &pcf8574;
-
-    // ---- MCP23017 ----
-    // MCP23017Expander mcp23017(0x20);
-    // IOExpander* ioExpander = &mcp23017;
-
-    // ---- SIN EXPANSOR ----
-    // IOExpander* ioExpander = nullptr;
-
-    // Configurar pines del selector como entrada en el expansor
-    ioExpander->pinMode(pin.SEL0, INPUT);
-    ioExpander->pinMode(pin.SEL1, INPUT);
-    ioExpander->pinMode(pin.SEL2, INPUT);
-
-    // Inicializar LCD
-    lcd_driver_init(&lcd, LCD_ADDR, LCD_COLS, LCD_ROWS);
-    pinMode(pin.PIN_ONOFF, OUTPUT);
-    digitalWrite(pin.PIN_ONOFF, HIGH); // mantener encendido
-
-    backlight_reset();
-
-    // Inicialización de hardware
+    // Inicializar bus I2C primero
     Wire.begin();
-    lcd_ui_setup(&lcd);
 
-    // Inicialización de pines
-    pinMode(pin.PIN_CAL, INPUT_PULLUP);
-    pinMode(pin.PIN_BUZZER, OUTPUT);
-    pinMode(pin.SEL0, INPUT_PULLUP);
-    pinMode(pin.SEL1, INPUT_PULLUP);
-    pinMode(pin.SEL2, INPUT_PULLUP);
+    // LCD
+    lcd_driver_init(&lcd, I2C_ADDR_LCD, LCD_COLS, LCD_ROWS);
+    lcd_driver_clear(&lcd);
 
-    // Inicialización de módulos
-    autoOff_reset();
+    // Expanders
+    pcfExpander.begin();
+    mcpExpander.begin();
+
+    // Configurar pines del selector usando los wrappers IOExpander
+    pcfExpander.pinMode(pin.SEL0, INPUT_PULLUP);
+    pcfExpander.pinMode(pin.SEL1, INPUT_PULLUP);
+    pcfExpander.pinMode(pin.SEL2, INPUT_PULLUP);
+
+    // Registrar pines en el selector (usando IOExpander*)
+    selector.addPin(&pcfExpander, pin.SEL0);
+    selector.addPin(&pcfExpander, pin.SEL1);
+    selector.addPin(&pcfExpander, pin.SEL2);
+
+    // Mapear valores de selector a modos
+    uint8_t fallbackMode = MODE_VDC; // variable para fallback
+    selector.addMapping(0b000, MODE_OFF);
+    selector.addMapping(0b001, MODE_VDC);
+    selector.addMapping(0b010, MODE_VAC);
+    selector.addMapping(0b011, MODE_CURRENT);
+    selector.addMapping(0b100, MODE_OHM);
+
+    // Inicializar calibración y ADC
     loadCalibration();
-    initFilters();
     adc_manager_init();
 
-    // Mensaje de bienvenida en pantalla
-    lcd_ui_clear(&lcd);
-    lcd_driver_print(&lcd, "Multímetro");
+    // Inicializar estados de backlight y auto-off
+    lastActivityTime = millis();
+    lastBacklightActivity = millis();
+    autoOffActive = false;
+    backlightOff = false;
+
+    // Limpiar LCD
+    lcd_driver_clear(&lcd);
 }
 
 void loop()
 {
-    // 1️⃣ Ejecutar el modo seleccionado
-    dispatchMode(selectedMode);
+    // Variable fallback
+    uint8_t fallbackMode = MODE_VDC;
 
-    // 2️⃣ Actualizaciones de sistemas auxiliares
+    // Variables auxiliares para updateMode
+    uint8_t selectedModeVal = (uint8_t)selectedMode;
+    uint8_t currentRangeVal = (uint8_t)currentRange;
+
+    // Actualizar modo y rango desde selector
+    selector.updateMode(selectedModeVal, currentRangeVal, fallbackMode);
+
+    // Guardar cambios de vuelta a las enums
+    selectedMode = (MainMode)selectedModeVal;
+    currentRange = (CurrentRange)currentRangeVal;
+
+    // Aquí colocar el resto de la lógica principal del multímetro
+    // Lecturas ADC, filtros, mediciones, etc.
+
+    // Actualizar backlight y auto-off
     backlight_update();
     autoOff_update();
-
-    // 3️⃣ Leer selector físico y actualizar selectedMode
-    int sel = readSelector();
-
-    switch (sel)
-    {
-    case 0:
-        selectedMode = MODE_VDC;
-        break;
-
-    case 1:
-        selectedMode = MODE_VAC;
-        break;
-
-    case 2:
-        selectedMode = MODE_OHM;
-        break;
-
-    case 3:
-        selectedMode = MODE_PN; // Diodo / Transistor / Zener / MOSFET
-        break;
-
-    case 4:
-        selectedMode = MODE_CURRENT;
-        currentRange = CURR_RANGE_mA; // rango miliamperios
-        break;
-
-    case 5:
-        selectedMode = MODE_CURRENT;
-        currentRange = CURR_RANGE_5A; // rango amperios
-        break;
-
-    case 6:
-        selectedMode = MODE_CAP;
-        break;
-
-    case 7:
-        selectedMode = MODE_INDUCT;
-        break;
-
-    default:
-        selectedMode = MODE_VDC; // fallback seguro
-        break;
-    }
-
-    // 4️⃣ Pequeña pausa para estabilidad
-    delay(100);
 }

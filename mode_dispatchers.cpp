@@ -1,5 +1,6 @@
 // globals
 #include "globals.h"
+#include "autoOff.h"
 
 #include "mode_dispatchers.h"
 

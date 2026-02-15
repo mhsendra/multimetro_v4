@@ -1,4 +1,5 @@
 #include "globals.h"
+#include "autoOff.h"
 #include <Arduino.h>
 #include <math.h>
 #include "mode_diode.h"

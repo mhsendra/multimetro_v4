@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "autoOff.h"
 #include <math.h>
 #include "Mode_CAP.h"
 #include "adcmanager.h"
