@@ -19,7 +19,7 @@
                 "C:\\Users\\mhsen\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.7\\cores\\arduino",
                 "C:\\Users\\mhsen\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.7\\variants\\standard",
                 "C:\\Users\\mhsen\\Documents\\Arduino\\libraries\\PCF8574",
-                "C:\\Users\\mhsen\\Documents\\Arduino\\libraries\\Adafruit_MCP23017_Arduino_Library",
+                "C:\\Users\\mhsen\\Documents\\Arduino\\libraries\\Adafruit_MCP23017_Arduino_Library\\src",
                 "C:\\Users\\mhsen\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C",
                 "C:\\Users\\mhsen\\Documents\\Arduino\\libraries\\Adafruit_ADS1X15",
                 "C:\\Users\\mhsen\\Documents\\Arduino\\libraries\\Adafruit_BusIO",
@@ -28,8 +28,7 @@
                 "C:\\Users\\mhsen\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.7\\libraries\\EEPROM\\src"
             ],
             "forcedInclude": [
-                "C:\\Users\\mhsen\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.7\\cores\\arduino\\Arduino.h",
-                "C:\\Users\\mhsen\\Documents\\Arduino\\libraries\\Adafruit_MCP23017_Arduino_Library\\src\\Adafruit_MCP23X17.h"
+                "C:\\Users\\mhsen\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.7\\cores\\arduino\\Arduino.h"
             ],
             "cStandard": "c11",
             "cppStandard": "c++11",
